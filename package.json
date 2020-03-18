@@ -1,0 +1,20 @@
+{
+  "name": "green_matrix",
+  "version": "1.0.0",
+  "description": "--- title: Green Matrix ---",
+  "main": "rain.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ductnn/Green-Rain.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ductnn/Green-Rain/issues"
+  },
+  "homepage": "https://github.com/ductnn/Green-Rain#readme"
+}
