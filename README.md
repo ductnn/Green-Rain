@@ -7,7 +7,10 @@ title: Green Matrix
 
 ``` bash
 $ git clone https://github.com/ductnn/Green-Rain
+$ cd Green-Rain
+$ npm install
+$ npm run dev
 ```
 Start on your Local
 
-More info: [Writing](https://github.com/ductnn)
+More info: [Ductn](https://github.com/ductnn)

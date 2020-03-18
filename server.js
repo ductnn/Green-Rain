@@ -5,7 +5,7 @@ const port = process.env.PORT || 3000;
 
 const app = new express();
 
-app.use(express.static('public'));
+app.use('/static', express.static('public'));
 app.set('view engine', 'pug');
 app.set('views', './views');
 
