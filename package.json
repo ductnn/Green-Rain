@@ -4,6 +4,8 @@
   "description": "--- title: Green Matrix ---",
   "main": "rain.js",
   "scripts": {
+    "dev": "node --inspect server.js",
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/ductnn/Green-Rain/issues"
   },
-  "homepage": "https://github.com/ductnn/Green-Rain#readme"
+  "homepage": "https://github.com/ductnn/Green-Rain#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^2.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
 }
