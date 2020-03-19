@@ -11,7 +11,7 @@ $ cd Green-Rain
 $ npm install
 $ npm run dev
 ```
-# **Start** and **Play** :))) 
-You can see demo in [here](https://green-rain.herokuapp.com/)
+> #### Start and Play :))) 
+> You can see demo in [here](https://green-rain.herokuapp.com/)
 
 More info: [Ductn](https://github.com/ductnn)
