@@ -14,4 +14,4 @@ $ npm run dev
 > #### Start and Play :))) 
 > You can see demo in [here](https://green-rain.herokuapp.com/)
 
-More info: [Ductn](https://github.com/ductnn)
+### [me](https://github.com/ductnn)
