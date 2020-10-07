@@ -33,9 +33,6 @@ function Symbol(x, y, speed) {
     this.switchInterval = round(random(2, 20));
 
     this.setToRandomSymbol = function(){
-        // this.value = String.fromCharCode(
-        //     0x30A0 + round(random(0, 96))
-        // );
         if (frameCount % this.switchInterval == 0){
             this.value = round(random(0, 1));
         };
