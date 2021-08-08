@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: green-rain-node
+    image: green-rain
     ports:
       - "3000:3000"
     restart: always
