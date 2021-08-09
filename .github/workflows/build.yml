@@ -1,0 +1,12 @@
+name: green-rain
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  docker:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
