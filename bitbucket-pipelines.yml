@@ -35,3 +35,5 @@ pipelines:
             # sync container to Docker Hub
             - docker push $DOCKER_HUB_USER/$APPLICATION:$ENV
             - docker push $DOCKER_HUB_USER/$APPLICATION:$VERSION
+          services:
+            - docker
