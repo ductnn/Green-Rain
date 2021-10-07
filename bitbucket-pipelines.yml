@@ -20,7 +20,6 @@ pipelines:
           script:
             - APPLICATION=green
             - ENV=$BITBUCKET_BRANCH
-            - VERSION=$ENV-$(git rev-parse --short HEAD)
 
             # build package
             - npm install
@@ -30,10 +29,10 @@ pipelines:
 
             # build docker application
             - docker build -t $DOCKER_HUB_USER/$APPLICATION:$ENV .
-            - docker tag $DOCKER_HUB_USER/$APPLICATION:$ENV $DOCKER_HUB_USER/$APPLICATION:$VERSION
+            - docker tag $DOCKER_HUB_USER/$APPLICATION:$ENV
 
             # sync container to Docker Hub
             - docker push $DOCKER_HUB_USER/$APPLICATION:$ENV
-            - docker push $DOCKER_HUB_USER/$APPLICATION:$VERSION
+
           services:
             - docker
