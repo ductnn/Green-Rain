@@ -10,8 +10,6 @@ pipelines:
           script:
             # install package
             - npm install
-
-    dev:
       - step:
           name: dev
           caches:
