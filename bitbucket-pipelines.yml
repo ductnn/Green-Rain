@@ -1,6 +1,7 @@
 image: node:15.5.1-alpine3.10
 pipelines:
   branches:
+
     master:
       - step:
           name: master
@@ -9,3 +10,28 @@ pipelines:
           script:
             # install package
             - npm install
+
+    dev:
+      - step:
+          name: dev
+          caches:
+            - node
+            - docker
+          script:
+            - APPLICATION=green
+            - ENV=$BITBUCKET_BRANCH
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+
+            # build package
+            - npm install
+
+            # login to docker hub
+            - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+
+            # build docker application
+            - docker build -t $DOCKER_HUB_USER/$APPLICATION:$ENV .
+            - docker tag $DOCKER_HUB_USER/$APPLICATION:$ENV $DOCKER_HUB_USER/$APPLICATION:$VERSION
+
+            # sync container to Docker Hub
+            - docker push $DOCKER_HUB_USER/$APPLICATION:$ENV
+            - docker push $DOCKER_HUB_USER/$APPLICATION:$VERSION
