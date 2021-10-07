@@ -1,0 +1,11 @@
+image: node:15.5.1-alpine3.10
+pipelines:
+  branches:
+    master:
+      - step:
+          name: master
+          caches:
+            - node
+          script:
+            # install package
+            - npm install
