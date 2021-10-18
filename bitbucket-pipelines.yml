@@ -74,7 +74,7 @@ pipelines:
             - chmod 400 ~/.kube/config
             - cd helm/$NAMEAPP
             # Deploy to K8s test
-            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$VERSION -f test.values.yaml -n test
+            - helm upgrade -i $NAMEAPP . --set image.tag=$NAMEAPP-$VERSION -f test.values.yaml -n test
 
           services:
             - docker
