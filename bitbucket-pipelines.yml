@@ -55,7 +55,9 @@ pipelines:
             # - docker push $IMAGE_BACKUP
 
             # Deployment
-            - helm
+            - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            - chmod 700 get_helm.sh
+            - ./get_helm.sh
             - helm version
             - mkdir -p ~/.kube
             - echo -n $CONFIG | base64 -d > ~/.kube/config
