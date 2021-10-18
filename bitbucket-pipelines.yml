@@ -4,46 +4,47 @@ pipelines:
     # Run testing
     feature/build-docker:
       - step:
-            name: Test
-            size: 2x
-            caches:
-              - nodecaching
-              - docker
-            script:
-              # ENV build in
-              - APPLICATION=green
-              - NAMEAPP=rain
-              - ENV=test
-              - BRANCH=feature/build-docker
-              - VERSION=$ENV-$(git rev-parse --short HEAD)
-              - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
-              - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+          <<: *build-deploy
+          name: Test
+          size: 2x
+          caches:
+            - nodecaching
+            - docker
+          script:
+            # ENV build in
+            - APPLICATION=green
+            - NAMEAPP=rain
+            - ENV=test
+            - BRANCH=feature/build-docker
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
-              # install & build
-              - npm install
+            # install & build
+            - npm install
 
-              # build docker application
-              - docker build -t $IMAGE_FIX -f Dockerfile .
-              - docker tag $IMAGE_FIX $IMAGE_BACKUP
-              - aws s3 ls
-              - echo $AWS_ACCESS_KEY_ID
-              - echo $AWS_SECRET_ACCESS_KEY
+            # build docker application
+            - docker build -t $IMAGE_FIX -f Dockerfile .
+            - docker tag $IMAGE_FIX $IMAGE_BACKUP
 
-              # login aws ecr
-              - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
-              - docker push $IMAGE_BACKUP
+            - echo $AWS_ACCESS_KEY_ID
+            - echo $AWS_SECRET_ACCESS_KEY
 
-              # Deployment
-              - helm version
-              - mkdir -p ~/.kube
-              - echo -n $CONFIG | base64 -d > ~/.kube/config
-              - chmod 400 ~/.kube/config
-              - cd helm/$NAMEAPP
-              # Deploy to K8s test
-              - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$ENV-$CI_COMMIT_SHORT_SHA -f test.values.yaml -n test
+            # login aws ecr
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
+            - docker push $IMAGE_BACKUP
 
-            services:
-              - docker
+            # Deployment
+            - helm version
+            - mkdir -p ~/.kube
+            - echo -n $CONFIG | base64 -d > ~/.kube/config
+            - chmod 400 ~/.kube/config
+            - cd helm/$NAMEAPP
+            # Deploy to K8s test
+            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$ENV-$CI_COMMIT_SHORT_SHA -f test.values.yaml -n test
+
+          services:
+            - docker
 
 definitions:
   services:
@@ -51,3 +52,15 @@ definitions:
       memory: 1024
   caches:
     nodecaching: ./node_modules
+  steps:
+    - step: &build-deploy
+        name: Build & Deploy to Test
+        deployment: Test
+        caches:
+          - nodecaching
+        script:
+          - pipe: atlassian/aws-s3-deploy:1.1.0
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
