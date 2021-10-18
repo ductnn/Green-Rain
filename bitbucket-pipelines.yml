@@ -56,7 +56,8 @@ pipelines:
             # - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
             # install & build
-            - npm install
+            # - npm install
+            - echo IMAGE_BACKUP
 
             # build docker application
             - docker build -t $IMAGE_FIX -f Dockerfile .
