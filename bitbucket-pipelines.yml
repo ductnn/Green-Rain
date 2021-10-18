@@ -59,6 +59,8 @@ pipelines:
             # - chmod 700 get_helm.sh
             # - apk add bash
             # - bash ./get_helm.sh
+          services:
+            - docker
       - step:
           image: alpine/helm:latest
           size: 2x
