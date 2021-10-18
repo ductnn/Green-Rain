@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: {{ include "green-rain.fullname" . }}
+  labels:
+    {{- include "green-rain.labels" . | nindent 4 }}
+spec:
+  prefix: {{ .Values.mapping.prefix }}
+  host: {{ .Values.mapping.host }}
+  service:  {{ include "green-rain.fullname" . }}

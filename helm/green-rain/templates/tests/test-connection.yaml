@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "green-rain.fullname" . }}-test-connection"
+  labels:
+    {{- include "green-rain.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "green-rain.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
