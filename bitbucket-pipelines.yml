@@ -25,6 +25,7 @@ pipelines:
               # build docker application
               - docker build -t $IMAGE_FIX -f Dockerfile .
               - docker tag $IMAGE_FIX $IMAGE_BACKUP
+              - aws s3 ls
               - echo $AWS_ACCESS_KEY_ID
               - echo $AWS_SECRET_ACCESS_KEY
 
