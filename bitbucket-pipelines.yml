@@ -18,11 +18,26 @@ definitions:
               AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
               AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
               AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+    
+    - step: &before_script
+        name: Set ENV
+        caches:
+          - nodecaching
+        script:
+            # ENV build in
+            - APPLICATION=vin21083
+            - NAMEAPP=green-rain
+            - ENV=test
+            - BRANCH=feature/build-docker
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
 pipelines:
   branches:
     # Run testing
     feature/build-docker:
+      - step: *before_script
       - step:
           <<: *build-deploy
           name: Test
@@ -32,13 +47,13 @@ pipelines:
             - docker
           script:
             # ENV build in
-            - APPLICATION=vin21083
-            - NAMEAPP=green-rain
-            - ENV=test
-            - BRANCH=feature/build-docker
-            - VERSION=$ENV-$(git rev-parse --short HEAD)
-            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
-            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+            # - APPLICATION=vin21083
+            # - NAMEAPP=green-rain
+            # - ENV=test
+            # - BRANCH=feature/build-docker
+            # - VERSION=$ENV-$(git rev-parse --short HEAD)
+            # - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            # - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
             # install & build
             - npm install
@@ -54,11 +69,6 @@ pipelines:
             - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
             - docker push $IMAGE_BACKUP
 
-            # Deployment
-            # - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-            # - chmod 700 get_helm.sh
-            # - apk add bash
-            # - bash ./get_helm.sh
           services:
             - docker
       - step:
@@ -68,13 +78,13 @@ pipelines:
             - nodecaching
             - docker
           script:
-            - APPLICATION=vin21083
-            - NAMEAPP=green-rain
-            - ENV=test
-            - BRANCH=feature/build-docker
-            - VERSION=$ENV-$(git rev-parse --short HEAD)
-            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
-            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+            # - APPLICATION=vin21083
+            # - NAMEAPP=green-rain
+            # - ENV=test
+            # - BRANCH=feature/build-docker
+            # - VERSION=$ENV-$(git rev-parse --short HEAD)
+            # - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            # - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
             - helm version
             - mkdir -p ~/.kube
