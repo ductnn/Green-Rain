@@ -33,7 +33,7 @@ pipelines:
           script:
             # ENV build in
             - APPLICATION=vin21083
-            - NAMEAPP=rain
+            - NAMEAPP=green-rain
             - ENV=test
             - BRANCH=feature/build-docker
             - VERSION=$ENV-$(git rev-parse --short HEAD)
@@ -74,7 +74,7 @@ pipelines:
             - chmod 400 ~/.kube/config
             - cd helm/$NAMEAPP
             # Deploy to K8s test
-            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$ENV-$CI_COMMIT_SHORT_SHA -f test.values.yaml -n test
+            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$VERSION -f test.values.yaml -n test
 
           services:
             - docker
