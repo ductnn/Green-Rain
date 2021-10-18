@@ -6,24 +6,44 @@ definitions:
       memory: 1024
   caches:
     nodecaching: ./node_modules
-  steps:
-    - step: &build-deploy
-        name: Build & Deploy to Test
-        deployment: Test
-        caches:
-          - nodecaching
-        script:
-          - pipe: atlassian/aws-ecr-push-image:1.4.2
-            variables:
-              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
-    
-    - step: &before_script
-        name: Set ENV
-        caches:
-          - nodecaching
-        script:
+  # steps:
+  #   - step: &build-deploy
+  #       name: Build & Deploy to Test
+  #       deployment: Test
+  #       caches:
+  #         - nodecaching
+  #       script:
+  #         - pipe: atlassian/aws-ecr-push-image:1.4.2
+  #           variables:
+  #             AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  #             AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  #             AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+
+    # - step: &before_script
+    #     name: Set ENV
+    #     caches:
+    #       - nodecaching
+    #     script:
+    #         # ENV build in
+    #         - APPLICATION=vin21083
+    #         - NAMEAPP=green-rain
+    #         - ENV=test
+    #         - BRANCH=feature/build-docker
+    #         - VERSION=$ENV-$(git rev-parse --short HEAD)
+    #         - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+    #         - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+
+pipelines:
+  branches:
+    # Run testing
+    feature/build-docker:
+      - step:
+          name: Test
+          size: 2x
+          caches:
+            - nodecaching
+            - docker
+          script:
             # ENV build in
             - APPLICATION=vin21083
             - NAMEAPP=green-rain
@@ -33,38 +53,12 @@ definitions:
             - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
             - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
-pipelines:
-  branches:
-    # Run testing
-    feature/build-docker:
-      - step: *before_script
-      - step:
-          <<: *build-deploy
-          name: Test
-          size: 2x
-          caches:
-            - nodecaching
-            - docker
-          script:
-            # ENV build in
-            # - APPLICATION=vin21083
-            # - NAMEAPP=green-rain
-            # - ENV=test
-            # - BRANCH=feature/build-docker
-            # - VERSION=$ENV-$(git rev-parse --short HEAD)
-            # - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
-            # - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
-
             # install & build
             # - npm install
-            - echo $IMAGE_BACKUP
 
             # build docker application
             - docker build -t $IMAGE_FIX -f Dockerfile .
             - docker tag $IMAGE_FIX $IMAGE_BACKUP
-
-            - echo $AWS_ACCESS_KEY_ID
-            - echo $AWS_SECRET_ACCESS_KEY
 
             # login aws ecr
             - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
@@ -79,13 +73,13 @@ pipelines:
             - nodecaching
             - docker
           script:
-            # - APPLICATION=vin21083
-            # - NAMEAPP=green-rain
-            # - ENV=test
-            # - BRANCH=feature/build-docker
-            # - VERSION=$ENV-$(git rev-parse --short HEAD)
-            # - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
-            # - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+            - APPLICATION=vin21083
+            - NAMEAPP=green-rain
+            - ENV=test
+            - BRANCH=feature/build-docker
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
             - helm version
             - mkdir -p ~/.kube
