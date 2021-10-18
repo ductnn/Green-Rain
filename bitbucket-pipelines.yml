@@ -61,6 +61,10 @@ pipelines:
             # - bash ./get_helm.sh
       - step:
           image: alpine/helm:latest
+          size: 2x
+          caches:
+            - nodecaching
+            - docker
           script:
             - helm version
             - mkdir -p ~/.kube
