@@ -41,24 +41,27 @@ pipelines:
             - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
             # install & build
-            # - npm install
+            - npm install
 
-            # # build docker application
-            # - docker build -t $IMAGE_FIX -f Dockerfile .
-            # - docker tag $IMAGE_FIX $IMAGE_BACKUP
+            # build docker application
+            - docker build -t $IMAGE_FIX -f Dockerfile .
+            - docker tag $IMAGE_FIX $IMAGE_BACKUP
 
-            # - echo $AWS_ACCESS_KEY_ID
-            # - echo $AWS_SECRET_ACCESS_KEY
+            - echo $AWS_ACCESS_KEY_ID
+            - echo $AWS_SECRET_ACCESS_KEY
 
-            # # login aws ecr
-            # - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
-            # - docker push $IMAGE_BACKUP
+            # login aws ecr
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
+            - docker push $IMAGE_BACKUP
 
             # Deployment
-            - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-            - chmod 700 get_helm.sh
-            - apk add bash
-            - bash ./get_helm.sh
+            # - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            # - chmod 700 get_helm.sh
+            # - apk add bash
+            # - bash ./get_helm.sh
+      - step:
+          image: alpine/helm:latest
+          script:
             - helm version
             - mkdir -p ~/.kube
             - echo -n $CONFIG | base64 -d > ~/.kube/config
