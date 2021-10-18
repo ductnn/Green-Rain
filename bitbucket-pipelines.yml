@@ -1,4 +1,4 @@
-image: vmodevteam/ci-node:v12
+image: quay.io/vmoteam/ci-node:v12-gitops
 pipelines:
   branches:
     # Run testing
