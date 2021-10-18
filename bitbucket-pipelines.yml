@@ -1,4 +1,24 @@
 image: quay.io/vmoteam/ci-node:v12-gitops
+
+definitions:
+  services:
+    docker:
+      memory: 1024
+  caches:
+    nodecaching: ./node_modules
+  steps:
+    - step: &build-deploy
+        name: Build & Deploy to Test
+        deployment: Test
+        caches:
+          - nodecaching
+        script:
+          - pipe: atlassian/aws-s3-deploy:1.1.0
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+
 pipelines:
   branches:
     # Run testing
@@ -46,21 +66,3 @@ pipelines:
           services:
             - docker
 
-definitions:
-  services:
-    docker:
-      memory: 1024
-  caches:
-    nodecaching: ./node_modules
-  steps:
-    - step: &build-deploy
-        name: Build & Deploy to Test
-        deployment: Test
-        caches:
-          - nodecaching
-        script:
-          - pipe: atlassian/aws-s3-deploy:1.1.0
-            variables:
-              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
