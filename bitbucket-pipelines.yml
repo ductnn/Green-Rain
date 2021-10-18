@@ -1,36 +1,50 @@
-image: node:15.5.1-alpine3.10
+image: vmodevteam/ci-node:v12
 pipelines:
   branches:
-
-    master:
+    # Run testing
+    feature/build-docker:
       - step:
-          name: master
-          caches:
-            - node
-          script:
-            # install package
-            - npm install
-      - step:
-          name: dev
-          caches:
-            - node
-            - docker
-          script:
-            - APPLICATION=green
-            - ENV=$BITBUCKET_BRANCH
+            name: Test
+            size: 2x
+            caches:
+              - nodecaching
+              - docker
+            script:
+              # ENV build in
+              - APPLICATION=green
+              - NAMEAPP=rain
+              - ENV=test
+              - BRANCH=feature/build-docker
+              - VERSION=$ENV-$(git rev-parse --short HEAD)
+              - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+              - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
 
-            # build package
-            - npm install
+              # install & build
+              - npm install
 
-            # login to docker hub
-            - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+              # build docker application
+              - docker build -t $IMAGE_FIX -f .docker/$ENV.dockerfile .
+              - docker tag $IMAGE_FIX $IMAGE_BACKUP
 
-            # build docker application
-            - docker build -t $DOCKER_HUB_USER/$APPLICATION:$ENV .
-            - docker tag $DOCKER_HUB_USER/$APPLICATION:$ENV
+              # login aws ecr
+              - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
+              - docker push $IMAGE_BACKUP
 
-            # sync container to Docker Hub
-            - docker push $DOCKER_HUB_USER/$APPLICATION:$ENV
+              # Deployment
+              - helm version
+              - mkdir -p ~/.kube
+              - echo -n $CONFIG | base64 -d > ~/.kube/config
+              - chmod 400 ~/.kube/config
+              - cd helm/$NAMEAPP
+              # Deploy to K8s test
+              - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$ENV-$CI_COMMIT_SHORT_SHA -f test.values.yaml -n test
 
-          services:
-            - docker
+            services:
+              - docker
+
+definitions:
+  services:
+    docker:
+      memory: 1024
+  caches:
+    nodecaching: ./node_modules
