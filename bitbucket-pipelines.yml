@@ -68,13 +68,21 @@ pipelines:
             - nodecaching
             - docker
           script:
+            - APPLICATION=vin21083
+            - NAMEAPP=green-rain
+            - ENV=test
+            - BRANCH=feature/build-docker
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+
             - helm version
             - mkdir -p ~/.kube
             - echo -n $CONFIG | base64 -d > ~/.kube/config
             - chmod 400 ~/.kube/config
             - cd helm/$NAMEAPP
             # Deploy to K8s test
-            - helm upgrade -i $NAMEAPP . --set image.tag=$NAMEAPP-$VERSION -f test.values.yaml -n test
+            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$VERSION -f test.values.yaml -n test
 
           services:
             - docker
