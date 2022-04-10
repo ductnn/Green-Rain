@@ -19,13 +19,6 @@ pipeline {
 
         // Build Image
         stage('Build Image') {
-            agent {
-                	docker {
-                        	reuseNode true
-                        	image 'ductn4/green-rain:1.1'            // Docker image for testing environment
-                        	args '-p 3000:3000 --privileged -v /var/run/docker.sock:/var/run/docker.sock'
-                	}
-           	}
             steps {
                 script {
                     dockerImage = docker.build registry + ":latest"
