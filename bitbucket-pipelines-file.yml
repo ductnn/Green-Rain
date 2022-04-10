@@ -1,0 +1,133 @@
+image: vmodevteam/ci-node:v12
+pipelines:
+  branches:
+    # Run develop
+    develop:
+      - step:
+          name: Dev
+          size: 2x
+          caches:
+            - nodecaching
+            - docker
+          script:
+            # ENV build in
+            - APPLICATION=shopping
+            - NAMEAPP=vinivialive-file
+            - ENV=dev
+            - BRANCH=develop
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+
+            # install & build
+            - yarn install
+            - yarn build
+            - yarn build:$ENV
+
+            # build docker application
+            - docker build -t $IMAGE_FIX -f .docker/$ENV.dockerfile .
+            - docker tag $IMAGE_FIX $IMAGE_BACKUP
+
+            # login aws ecr
+            - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
+            - docker push $IMAGE_BACKUP
+
+          services:
+            - docker
+
+      - step:
+          image: alpine/helm:latest
+          size: 2x
+          caches:
+            - nodecaching
+            - docker
+          script:
+            # ENV build in
+            - APPLICATION=shopping
+            - NAMEAPP=vinivialive-file
+            - ENV=dev
+            - BRANCH=develop
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+
+            # Deployment
+            - helm version
+            - mkdir -p ~/.kube
+            - echo -n $CONFIG | base64 -d > ~/.kube/config
+            - chmod 400 ~/.kube/config
+            - cd helm/$NAMEAPP
+            # Deploy to K8s dev
+            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$ENV-$CI_COMMIT_SHORT_SHA -n default
+
+          services:
+            - docker
+
+    # Run testing
+    testing:
+      - step:
+            name: Test
+            size: 2x
+            caches:
+              - nodecaching
+              - docker
+            script:
+              # ENV build in
+              - APPLICATION=shopping
+              - NAMEAPP=vinivialive-file
+              - ENV=test
+              - BRANCH=testing
+              - VERSION=$ENV-$(git rev-parse --short HEAD)
+              - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+              - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+
+              # install & build
+              - yarn install
+              - yarn build
+              - yarn build:dev
+
+              # build docker application
+              - docker build -t $IMAGE_FIX -f .docker/$ENV.dockerfile .
+              - docker tag $IMAGE_FIX $IMAGE_BACKUP
+
+              # login aws ecr
+              - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY_HOST
+              - docker push $IMAGE_BACKUP
+
+            services:
+              - docker
+
+      - step:
+          image: alpine/helm:latest
+          size: 2x
+          caches:
+            - nodecaching
+            - docker
+          script:
+            # ENV build in
+            - APPLICATION=shopping
+            - NAMEAPP=vinivialive-file
+            - ENV=test
+            - BRANCH=testing
+            - VERSION=$ENV-$(git rev-parse --short HEAD)
+            - IMAGE_FIX=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$ENV
+            - IMAGE_BACKUP=$DOCKER_REGISTRY_HOST/$APPLICATION:$NAMEAPP-$VERSION
+
+            # Deployment
+            - helm version
+            - mkdir -p ~/.kube
+            - echo -n $CONFIG | base64 -d > ~/.kube/config
+            - chmod 400 ~/.kube/config
+            - cd helm/$NAMEAPP
+            # Deploy to K8s test
+            - helm upgrade -i $NAMEAPP ./ --set image.tag=$NAMEAPP-$ENV-$CI_COMMIT_SHORT_SHA -f test.values.yaml -n test
+
+          services:
+            - docker
+
+definitions:
+  services:
+    docker:
+      memory: 1024
+  caches:
+    nodecaching: ./node_modules
