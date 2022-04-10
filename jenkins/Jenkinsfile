@@ -37,6 +37,15 @@ pipeline {
             }
         }
 
+        // Deploy to K8s
+        stage('Deploy to k8s') {
+            steps {
+                script {
+                    sh "kubectl apply -f deployment.yaml"
+                }
+            }
+        }
+
         // Remove image
         stage('Remove') {
             steps {
