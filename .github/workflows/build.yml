@@ -37,7 +37,6 @@ jobs:
       - name: Install app
         run: |
           npm ci
-          npm run build
 
       - name: Build and Push Docker Images
         uses: docker/build-push-action@v2
