@@ -7,6 +7,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
+  
+    strategy:
+      matrix:
+        node-version: [16.x]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -29,6 +34,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Install app
+        run: |
+          npm ci
+          npm run build
+
       - name: Build and Push Docker Images
         uses: docker/build-push-action@v2
         id: docker_build
@@ -48,11 +58,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Install app
-        run: |
-          npm install
-          npm run build
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v2
