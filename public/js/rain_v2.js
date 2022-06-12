@@ -50,7 +50,7 @@ function Symbol(x, y, speed, first, opacity) {
                 );
             } else {
                 // set it to numeric
-                this.value = floor(random(0,10));
+                this.value = floor(random(0, 10));
             };
         };
     };
@@ -62,12 +62,12 @@ function Symbol(x, y, speed, first, opacity) {
 
 function Stream() {
     this.symbols = [];
-    this.totalSymbols = round(random(5, 35));
-    this.speed = random(5, 10);
+    this.totalSymbols = round(random(5, 20));
+    this.speed = random(2, 3);
 
     this.generateSymbols = function(x, y) {
         var opacity = 255;
-        var first = round(random(0, 4)) == 1;
+        var first = round(random(0, 5)) == 1;
 
         for (var i =0; i <= this.totalSymbols; i++) {
             symbol = new Symbol(x, y, this.speed, first, opacity);
