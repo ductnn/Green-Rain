@@ -14,7 +14,7 @@ def deploy() {
         withKubeConfig([credentialsId: 'mykubeconfig']) {
             sh 'ls -la'
             sh 'pwd'
-            sh '/var/jenkins_home/workspace/'kube test'/'kube command'/kubectl apply -f deployment.yaml'
+            sh '/bin/kubectl apply -f deployment.yaml'
         }
     }
 }
