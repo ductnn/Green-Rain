@@ -1,56 +1,19 @@
-pipeline {
+node {
+    checkout()
+    deploy()
+}
 
-    environment {
-        registry = "ductn4/green-rain"
-        registryCredential = "dockerhub_id"
-        dockerImage = ''
+def checkout() {
+    stage('Clone') {
+        checkout scm
     }
+}
 
-    agent any
-
-    stages {
-
-        // Clone git repo
-        stage('clone') {
-            steps {
-                git 'https://github.com/ductnn/Green-Rain.git'
-            }
-        }
-
-        // Build Image
-        stage('Build Image') {
-            steps {
-                script {
-                    dockerImage = docker.build registry + ":latest"
-                }
-            }
-        }
-
-        // Deploy Image
-        stage('Deploy Image') {
-            steps {
-                script {
-                    docker.withRegistry('', registryCredential) {
-                        dockerImage.push()
-                    }
-                }
-            }
-        }
-
-        // Deploy to K8s
-        stage('Deploy to k8s') {
-            steps {
-                script {
-                    sh "kubectl apply -f deployment.yaml"
-                }
-            }
-        }
-
-        // Remove image
-        stage('Remove') {
-            steps {
-                sh "docker rmi $registry:latest"
-            }
+def deploy() {
+    stage('Deploy') {
+        dir (".") {
+            sh 'ls -la'
+            sh '/var/jenkins_home/workspace/kube/kubectl apply -f deployment.yaml'
         }
     }
 }
