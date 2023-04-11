@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: ductn4/green-rain:latest
+        image: ductn4/green-rain:v2
         resources:
           limits:
             memory: "128Mi"
@@ -28,9 +28,8 @@ metadata:
 spec:
   selector:
     app: myapp
+  type: NodePort
   ports:
   - port: 3000
     targetPort: 3000
-    protocol: TCP
-  type: ClusterIP
-
+    nodePort: 30000
