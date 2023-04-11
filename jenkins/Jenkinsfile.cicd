@@ -11,8 +11,10 @@ def checkout() {
 
 def deploy() {
     stage('Deploy') {
-        sh 'ls -la'
-        sh 'pwd'
-        sh '/var/jenkins_home/workspace/'kube test'/'kube command'/kubectl apply -f deployment.yaml'
+        withKubeConfig([credentialsId: 'mykubeconfig']) {
+            sh 'ls -la'
+            sh 'pwd'
+            sh '/var/jenkins_home/workspace/'kube test'/'kube command'/kubectl apply -f deployment.yaml'
+        }
     }
 }
