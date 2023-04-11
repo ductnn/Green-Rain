@@ -11,9 +11,8 @@ def checkout() {
 
 def deploy() {
     stage('Deploy') {
-        dir (".") {
-            sh 'ls -la'
-            sh '/var/jenkins_home/workspace/kube/kubectl apply -f deployment.yaml'
-        }
+        sh 'ls -la'
+        sh 'pwd'
+        sh '/var/jenkins_home/workspace/'kube test'/'kube command'/kubectl apply -f deployment.yaml'
     }
 }
