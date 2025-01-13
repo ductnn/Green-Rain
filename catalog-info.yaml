@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: green-rain-5test
+  title: Sample Service 5test
+  description: |
+    A service for testing Backstage functionality! Configured for GitHub Actions, Sentry, AWS Lambda, Datadog and mis-configured techdocs.
+  annotations:
+    last-security-review: 2025-1-13
+    github.com/project-slug: ductnn/Green-Rain
+    sentry.io/project-slug: green-rain
+    backstage.io/techdocs-ref: dir:.
+    prometheus.io/rule: memUsage|component,node_memory_Active_bytes|instance,sum by (instance) (node_cpu_seconds_total)|instance
+    prometheus.io/alert: 'Excessive Memory Usage'
+  labels: 
+    label2/label1: test-label
+spec:
+  type: service
+  owner: user:ductnn
+  lifecycle: experimental
+  providesApis:
+    - green-rain
